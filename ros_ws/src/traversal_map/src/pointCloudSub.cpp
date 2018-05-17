@@ -113,7 +113,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
 
 
   // convert the traversal map to ros image msg
-
+  sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", traversal_map).toImageMsg();
 
 
 
@@ -122,7 +122,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   // output = *input;
 
   // Publish the data.
-  // pub.publish (output);
+  pub.publish (traversal_map_msg);
 }
 
 int main (int argc, char** argv)
@@ -135,7 +135,7 @@ int main (int argc, char** argv)
   ros::Subscriber sub = nh.subscribe ("/zed/point_cloud/cloud_registered", 1, cloud_cb);
 
   // Create a ROS publisher for the output point cloud
-  pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
+  pub = nh.advertise<sensor_msgs::Image> ("traversal_map", 1);
 
   // Spin
   ros::spin ();

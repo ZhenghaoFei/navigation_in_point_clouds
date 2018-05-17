@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   roscpp
   sensor_msgs
+  cv_bridge
+  image_transport
 )
 find_package( OpenCV REQUIRED )
 
