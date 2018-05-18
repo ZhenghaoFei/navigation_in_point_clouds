@@ -9,13 +9,12 @@ from sensor_msgs.msg import Imu
 
 import math
 
-pub = rospy.Publisher('/imu/data', Imu, queue_size=1)
+pub = rospy.Publisher('imu/data', Imu, queue_size=1)
 
 
 def change_frame(msg):
 
     msg_temp = msg
-    msg
     pub.publish(msg)
 
 

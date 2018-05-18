@@ -16,7 +16,7 @@ def publish_pose(msg):
 
     gps_odom = Odometry()   
     gps_odom.header.stamp = msg.header.stamp
-    gps_odom.header.frame_id = "earth"
+    gps_odom.header.frame_id = "map"
     utm_coord = utm.from_latlon(msg.latitude, msg.longitude)
     # odom_quat = tf.transformations.quaternion_from_euler(0, 0, 0.93863332 + math.pi/4)
     odom_quat = tf.transformations.quaternion_from_euler(0, 0, 0.93863332 + math.pi/4)

@@ -41,7 +41,7 @@
 
       <rosparam command="load" file="$(find robot_localization)/params/navsat_transform_template.yaml" />
 
-      <remap from="imu/data" to="imu/imu"/>
+      <!-- <remap from="imu/data" to="imu/imu"/> -->
 
   </node>
 </launch>
