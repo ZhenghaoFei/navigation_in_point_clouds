@@ -20,6 +20,13 @@ def cam_pose(msg):
                      "zed_left_camera",
                      "map")
 
+    br.sendTransform((0, 0, 0, 0 ),
+                      (0, 0, 0, 1),
+                      msg.header.stamp,
+                     "imu",
+                     "zed_left_camera")
+
+
     br.sendTransform( (0 , 0,  0, 0),
                       (q_init[0], q_init[1], q_init[2], q_init[3]),
                       msg.header.stamp,
