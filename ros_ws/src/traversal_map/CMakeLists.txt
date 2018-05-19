@@ -193,5 +193,5 @@ include_directories(
 # catkin_add_nosetests(test)
 
 
-add_executable(run src/pointCloudSub.cpp)
-target_link_libraries(run ${OpenCV_LIBS} ${catkin_LIBRARIES})
+add_executable(generate_traversal_map src/pointCloudSub.cpp)
+target_link_libraries(generate_traversal_map ${OpenCV_LIBS} ${catkin_LIBRARIES})

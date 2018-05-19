@@ -4,7 +4,6 @@
 
     <node pkg="robot_localization" type="change_visodom_frame.py" name="change_visodom_frame"> </node>
 
-
     <node pkg="robot_localization" type="change_gps_frame.py" name="change_gps_frame"> </node>
 
     <node pkg="robot_localization" type="publish_tf.py" name="publish_tf"> </node>
@@ -23,5 +22,8 @@
         <rosparam command="load" file="$(find robot_localization)/params/navsat_transform_template.yaml" />
         <remap from="imu/imu" to="imu/data"/>
     </node>
+
+    <node pkg="traversal_map" type="generate_traversal_map" name="traversal_map"> </node>
+
 
 </launch>
