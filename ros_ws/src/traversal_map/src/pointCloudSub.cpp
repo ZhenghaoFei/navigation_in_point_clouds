@@ -19,13 +19,13 @@
 
 ros::Publisher pub;
 
-void generate_traversa_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::MatrixXf& collision_map)
+void generate_traversa_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::MatrixXi& collision_map)
 {
 
 
     float grid_size_xy = 0.2;
-    float car_height_min = - 0.9;
-    float car_height_max = car_height_min + 1.5;
+    float car_height_min = - 0.8;
+    float car_height_max = car_height_min + 1;
     float min_x = 0.;
     float min_y = -20.;
 
@@ -59,14 +59,14 @@ void generate_traversa_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::M
 }
 
 
-void threshold_collision_map(Eigen::MatrixXf& collision_map, int threshold)
+void threshold_collision_map(Eigen::MatrixXi& collision_map, int threshold)
 {
   int size = collision_map.size();
   for (int i = 0; i < size; ++i)
   {
     if(collision_map(i) > threshold)
     {
-      collision_map(i) = 1;
+      collision_map(i) = 255;
     }
     else
     {
@@ -93,29 +93,30 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   map_x = 100; // x from 0 m to 20 m
   map_y = 200; // y from -20 m to 20 m
 
-  Eigen::MatrixXf collision_map = Eigen::MatrixXf::Zero(map_x, map_y);
+  Eigen::MatrixXi collision_map = Eigen::MatrixXi::Zero(map_x, map_y);
 
 
   generate_traversa_map(cloud, collision_map);
   // std::cout << "collision_map "<< collision_map<< std::endl; 
 
-  int threshold = 200;
+  int threshold = 100;
   threshold_collision_map(collision_map, threshold);
   // collision_map /= collision_map.maxCoeff();
   // std::cout << "collision_map "<< collision_map<< std::endl; 
 
-  cv::Mat traversal_map;
+  cv::Mat traversal_map, traversal_map8;
   cv::eigen2cv(collision_map, traversal_map);
 
+  traversal_map.convertTo(traversal_map8, CV_8U);
 
-  cv::imshow( "traversal_map", traversal_map );
-  cv::waitKey(100);
+
+
+  // cv::imshow( "traversal_map", traversal_map );
+  // cv::waitKey(100);
 
 
   // convert the traversal map to ros image msg
-  sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono16", traversal_map).toImageMsg();
-
-
+  sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", traversal_map8).toImageMsg();
 
 
   // Do data processing here...
