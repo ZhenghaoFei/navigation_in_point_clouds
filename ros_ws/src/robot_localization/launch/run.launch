@@ -23,7 +23,7 @@
         <remap from="imu/imu" to="imu/data"/>
     </node>
 
-    <node pkg="traversal_map" type="generate_traversal_map" name="traversal_map"> </node>
+    <!-- <node pkg="traversal_map" type="generate_traversal_map" name="traversal_map"> </node> -->
 
 
 </launch>
