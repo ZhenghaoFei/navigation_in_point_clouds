@@ -146,7 +146,7 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   cv::Mat traversal_map, traversal_map8;
   cv::eigen2cv(collision_map, traversal_map);
 
-  traversal_map.convertTo(traversal_map8, CV_8U);
+  traversal_map.convertTo(traversal_map, CV_8U);
 
 
 
@@ -161,10 +161,12 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
 
 
   cv::imshow( "height_image", height_image );
+  cv::imshow( "traversal_map8", traversal_map );
+
   cv::waitKey(1);
 
   // convert the traversal map to ros image msg
-  sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", traversal_map8).toImageMsg();
+  sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", traversal_map).toImageMsg();
 
 
   // Do data processing here...
