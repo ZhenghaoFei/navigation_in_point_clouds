@@ -75,7 +75,7 @@ void threshold_collision_map(Eigen::MatrixXi& collision_map, int threshold)
   }
 }
 
-void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat& height_image)
+void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat& height_image, cv::Mat& height_image_valid)
 {
 
     uint pnumber =  cloud.width * cloud.height;
@@ -85,8 +85,11 @@ void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat&
     double maxVal = 4;
     cv::Point minLoc, maxLoc; 
 
-    cv::MatIterator_<float> iter;
-    iter = height_image.begin<float>();
+    cv::MatIterator_<float> height_image_iter;
+    cv::MatIterator_<float> height_image_valid_iter;
+
+    height_image_iter = height_image.begin<float>();
+    height_image_valid_iter = height_image_valid.begin<float>();
 
     // Main Loop
     for (int point_id = 0; point_id < pnumber; ++point_id)
@@ -97,12 +100,16 @@ void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat&
         // make sure is a valid point
         if ( !std::isnan(cloud.points[point_id].z) && !std::isinf(cloud.points[point_id].z) )
         {
-           *iter = cloud.points[point_id].z;
+           *height_image_iter = cloud.points[point_id].z;
+        }
+        else
+        {
+          *height_image_valid_iter = 0.;
         }
 
 
-        iter ++;
-
+        height_image_iter ++;
+        height_image_valid_iter ++;
     }
     // cv::minMaxLoc(height_image, &minVal, &maxVal, &minLoc, &maxLoc );
 
@@ -111,8 +118,8 @@ void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat&
     height_image /= float(maxVal-minVal);
     height_image *= 255;
     height_image.convertTo(height_image, CV_8U);
-
     applyColorMap(height_image, height_image, cv::COLORMAP_JET);
+
 }
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
@@ -157,11 +164,14 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   
   // Eigen::MatrixXi height_image = Eigen::MatrixXi::Zero(cloud.width, cloud.height);
   cv::Mat height_image =  cv::Mat::zeros(cloud.height,  cloud.width, CV_32F);
-  generate_height_image(cloud, height_image);
+  cv::Mat height_image_valid =  cv::Mat::ones(cloud.height,  cloud.width, CV_32F);
+
+  generate_height_image(cloud, height_image, height_image_valid);
 
 
   cv::imshow( "height_image", height_image );
-  cv::imshow( "traversal_map8", traversal_map );
+  cv::imshow( "traversal_map", traversal_map );
+  cv::imshow( "height_image_valid", height_image_valid );
 
   cv::waitKey(1);
 
