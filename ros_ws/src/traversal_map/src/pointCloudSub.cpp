@@ -19,7 +19,7 @@
 
 ros::Publisher pub;
 
-void generate_traversa_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::MatrixXi& collision_map)
+void generate_traversal_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::MatrixXi& collision_map)
 {
 
 
@@ -29,7 +29,7 @@ void generate_traversa_map(const pcl::PointCloud<pcl::PointXYZ>& cloud, Eigen::M
     float min_x = 0.;
     float min_y = -20.;
 
-    uint pnumber = 720*1080;
+    uint pnumber =  cloud.width * cloud.height;
 
     int x_idx ,y_idx;
 
@@ -75,6 +75,42 @@ void threshold_collision_map(Eigen::MatrixXi& collision_map, int threshold)
   }
 }
 
+void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat& height_image)
+{
+
+    uint pnumber =  cloud.width * cloud.height;
+    int x_idx, y_idx;
+
+    double minVal = -1;
+    double maxVal = 4;
+    cv::Point minLoc, maxLoc; 
+
+    cv::MatIterator_<float> iter;
+    iter = height_image.begin<float>();
+
+    // Main Loop
+    for (int point_id = 0; point_id < pnumber; ++point_id)
+    {
+        // x_idx = point_id / cloud.width;
+        // y_idx = point_id &  cloud.height;
+
+        // make sure is a valid point
+        if ( !std::isnan(cloud.points[point_id].z) && !std::isinf(cloud.points[point_id].z) )
+        {
+           *iter = cloud.points[point_id].z;
+        }
+
+
+        iter ++;
+
+    }
+    // cv::minMaxLoc(height_image, &minVal, &maxVal, &minLoc, &maxLoc );
+
+
+    height_image = height_image - float(minVal);
+    height_image /= float(maxVal-minVal);
+
+}
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
 {
@@ -95,8 +131,8 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
 
   Eigen::MatrixXi collision_map = Eigen::MatrixXi::Zero(map_x, map_y);
 
+  generate_traversal_map(cloud, collision_map);
 
-  generate_traversa_map(cloud, collision_map);
   // std::cout << "collision_map "<< collision_map<< std::endl; 
 
   int threshold = 100;
@@ -114,6 +150,19 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   // cv::imshow( "traversal_map", traversal_map );
   // cv::waitKey(100);
 
+
+  
+  // Eigen::MatrixXi height_image = Eigen::MatrixXi::Zero(cloud.width, cloud.height);
+  cv::Mat height_image =  cv::Mat::zeros(cloud.height,  cloud.width, CV_32F);
+  generate_height_image(cloud, height_image);
+  cv::Mat height_image_color;
+  height_image *= 255;
+  height_image.convertTo(height_image, CV_8U);
+
+  applyColorMap(height_image, height_image_color, cv::COLORMAP_JET);
+
+  cv::imshow( "height_image", height_image_color );
+  cv::waitKey(1);
 
   // convert the traversal map to ros image msg
   sensor_msgs::ImagePtr traversal_map_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", traversal_map8).toImageMsg();
