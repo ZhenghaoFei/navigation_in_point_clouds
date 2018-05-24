@@ -109,7 +109,10 @@ void generate_height_image(const pcl::PointCloud<pcl::PointXYZ>& cloud, cv::Mat&
 
     height_image = height_image - float(minVal);
     height_image /= float(maxVal-minVal);
+    height_image *= 255;
+    height_image.convertTo(height_image, CV_8U);
 
+    applyColorMap(height_image, height_image, cv::COLORMAP_JET);
 }
 
 void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
@@ -155,13 +158,9 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& point_cloud_msg_ptr)
   // Eigen::MatrixXi height_image = Eigen::MatrixXi::Zero(cloud.width, cloud.height);
   cv::Mat height_image =  cv::Mat::zeros(cloud.height,  cloud.width, CV_32F);
   generate_height_image(cloud, height_image);
-  cv::Mat height_image_color;
-  height_image *= 255;
-  height_image.convertTo(height_image, CV_8U);
 
-  applyColorMap(height_image, height_image_color, cv::COLORMAP_JET);
 
-  cv::imshow( "height_image", height_image_color );
+  cv::imshow( "height_image", height_image );
   cv::waitKey(1);
 
   // convert the traversal map to ros image msg
