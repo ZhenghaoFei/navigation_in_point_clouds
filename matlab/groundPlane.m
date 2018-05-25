@@ -1,4 +1,6 @@
 ptCloud = pcread('./data/example.pcd');
+
+player = pcplayer(ptCloud.XLimits, ptCloud.YLimits, ptCloud.ZLimits);
 %% Rotate point clouds
 theta = 0;
 R1 = [1, 0, 0, 0; 
@@ -31,13 +33,27 @@ R = R1 * R2 * R3 + t
 trans = affine3d(R);
 ptCloudOut = pctransform(ptCloud,trans);
 
-pcshow(ptCloudOut)
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
+%%
+maxDistance = 0.2; % in meters
+referenceVector = [0, 0, 1];
+[~, inPlanePointIndices, outliers] = pcfitplane(ptCloudOut, maxDistance, referenceVector);
 
 %%
-heightmap = ptCloudOut.Location(:, :, 3);
-heightmap(isnan(heightmap)) = 0;
+blue = [0, 0, 1];
+red = [1, 0, 0];
+green = [0, 1, 1];
 
-heightmap = heightmap - 
+
+% Select the points that are not part of the ground plane.
+pcWithoutGround = select(ptCloudOut, inPlanePointIndices);
+obs_pc = select(ptCloudOut, outliers);
+
+pcshow(obs_pc.Location, red);
+hold
+pcshow(pcWithoutGround.Location, green);
+
+
+
