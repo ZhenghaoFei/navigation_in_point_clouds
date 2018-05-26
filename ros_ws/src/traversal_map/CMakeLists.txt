@@ -195,6 +195,9 @@ include_directories(
 
 add_executable(generate_traversal_map src/pointCloudSub.cpp)
 add_executable(point_cloud_map src/pointCloudMap.cpp)
+add_executable(point_cloud_ground_segmentation src/pointCloudGroundSegmentation.cpp)
+
 
 target_link_libraries(generate_traversal_map ${OpenCV_LIBS} ${catkin_LIBRARIES})
 target_link_libraries(point_cloud_map ${OpenCV_LIBS} ${catkin_LIBRARIES})
+target_link_libraries(point_cloud_ground_segmentation ${OpenCV_LIBS} ${catkin_LIBRARIES})
